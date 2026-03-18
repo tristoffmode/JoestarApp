@@ -12,10 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.JoestarApp">
         <activity
-            android:name=".Compteur"
+            android:name=".CompteurActivity"
             android:exported="false" />
         <activity
-            android:name=".Chronometre"
+            android:name=".ChronometreActivity"
             android:exported="false" />
         <activity
             android:name=".LabyrintheActivity"
