@@ -12,6 +12,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.JoestarApp">
         <activity
+            android:name=".Compteur"
+            android:exported="false" />
+        <activity
+            android:name=".Chronometre"
+            android:exported="false" />
+        <activity
+            android:name=".LabyrintheActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
