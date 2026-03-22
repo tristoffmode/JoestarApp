@@ -1,5 +1,6 @@
 package com.example.joestarapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.Toast;
@@ -28,7 +29,12 @@ public class MainActivity extends AppCompatActivity {
         Button button2 = findViewById(R.id.button2);
         Button button3 = findViewById(R.id.button3);
 
-        button1.setOnClickListener(v -> Toast.makeText(this, "Button 1 est cliqué", Toast.LENGTH_SHORT).show());
+        // Intégration de l'Intent pour naviguer vers le Compteur de pas
+        button1.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, CompteurActivity.class);
+            startActivity(intent);
+        });
+
         button2.setOnClickListener(v -> Toast.makeText(this, "Button 2 est cliqué", Toast.LENGTH_SHORT).show());
         button3.setOnClickListener(v -> Toast.makeText(this, "Button 3 est cliqué", Toast.LENGTH_SHORT).show());
     }
