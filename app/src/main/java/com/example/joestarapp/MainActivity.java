@@ -30,11 +30,12 @@ public class MainActivity extends AppCompatActivity {
         Button button3 = findViewById(R.id.button3);
 
         // Intégration de l'Intent pour naviguer vers le Compteur de pas
-        button1.setOnClickListener(v -> {
+        button2.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, CompteurActivity.class);
             startActivity(intent);
         });
 
+        button1.setOnClickListener(v -> Toast.makeText(this, "Button 2 est cliqué", Toast.LENGTH_SHORT).show());
         button2.setOnClickListener(v -> Toast.makeText(this, "Button 2 est cliqué", Toast.LENGTH_SHORT).show());
         button3.setOnClickListener(v -> Toast.makeText(this, "Button 3 est cliqué", Toast.LENGTH_SHORT).show());
     }
