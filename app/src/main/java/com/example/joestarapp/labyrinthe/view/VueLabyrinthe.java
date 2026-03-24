@@ -17,8 +17,16 @@ import com.example.joestarapp.labyrinthe.viewmodel.MetierLabyrinthe;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Vue personnalisée permettant d'afficher le labyrinthe,
+ * le joueur, l'arrivée et de gérer le dessin du chemin tactile.
+ */
 public class VueLabyrinthe extends View
 {
+    /*-------------------------------------------*/
+    /*             Attributs d'instance          */
+    /*-------------------------------------------*/
+
     private Niveau niveau;
     private Joueur joueur;
 
@@ -31,27 +39,22 @@ public class VueLabyrinthe extends View
     private Paint paintCheminDessin;
     private Paint paintCheminValide;
 
-    private final RectF rectTemp = new RectF();
+    private RectF rectTemp;
 
-
-    private final List<int[]> chemin        = new ArrayList<>();
-    private boolean           cheminValide  = false;
-    private boolean           enDessin      = false;
-
-    public interface EcouteDessin
-    {
-        void onDebutDessin();       // demande la pause
-        void onFinDessinValide();   // chemin valide → suivre le chemin
-        void onFinDessinInvalide(); // chemin invalide → reprendre
-    }
+    private List<int[]> chemin;
+    private boolean     cheminValide;
+    private boolean     enDessin;
 
     private EcouteDessin ecouteDessin;
 
-    public void setEcouteDessin(EcouteDessin e) { this.ecouteDessin = e; }
+
+    /*-------------------------------------------*/
+    /*                Constructeurs              */
+    /*-------------------------------------------*/
 
     public VueLabyrinthe(Context context)
     {
-        this(context,null);
+        this(context, null);
     }
 
     public VueLabyrinthe(Context context, AttributeSet attrs)
@@ -60,51 +63,86 @@ public class VueLabyrinthe extends View
         this.init();
     }
 
+
+    /*-------------------------------------------*/
+    /*                Initialisation             */
+    /*-------------------------------------------*/
+
     private void init()
     {
-        paintMur = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paintMur.setColor(Color.parseColor("#1E2A3A"));
-        paintMur.setStyle(Paint.Style.FILL);
+        this.rectTemp     = new RectF();
+        this.chemin       = new ArrayList<>();
+        this.cheminValide = false;
+        this.enDessin     = false;
 
-        paintBordureMur = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paintBordureMur.setColor(Color.parseColor("#2E3D52"));
-        paintBordureMur.setStyle(Paint.Style.STROKE);
-        paintBordureMur.setStrokeWidth(1f);
+        this.paintMur = new Paint(Paint.ANTI_ALIAS_FLAG);
+        this.paintMur.setColor(Color.parseColor("#1E2A3A"));
+        this.paintMur.setStyle(Paint.Style.FILL);
 
-        paintSol = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paintSol.setColor(Color.parseColor("#F0EAD6"));
-        paintSol.setStyle(Paint.Style.FILL);
+        this.paintBordureMur = new Paint(Paint.ANTI_ALIAS_FLAG);
+        this.paintBordureMur.setColor(Color.parseColor("#2E3D52"));
+        this.paintBordureMur.setStyle(Paint.Style.STROKE);
+        this.paintBordureMur.setStrokeWidth(1f);
 
-        paintJoueur = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paintJoueur.setColor(Color.parseColor("#4A90E2"));
-        paintJoueur.setStyle(Paint.Style.FILL);
-        paintJoueur.setShadowLayer(6f, 0f, 0f, Color.parseColor("#804A90E2"));
+        this.paintSol = new Paint(Paint.ANTI_ALIAS_FLAG);
+        this.paintSol.setColor(Color.parseColor("#F0EAD6"));
 
-        paintArrive = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paintArrive.setColor(Color.parseColor("#2ECC71"));
-        paintArrive.setStyle(Paint.Style.FILL);
+        this.paintJoueur = new Paint(Paint.ANTI_ALIAS_FLAG);
+        this.paintJoueur.setColor(Color.parseColor("#4A90E2"));
+        this.paintJoueur.setShadowLayer(6f, 0f, 0f, Color.parseColor("#804A90E2"));
 
-        paintDepart = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paintDepart.setColor(Color.parseColor("#E67E22"));
-        paintDepart.setStyle(Paint.Style.FILL);
-        paintDepart.setAlpha(120);
+        this.paintArrive = new Paint(Paint.ANTI_ALIAS_FLAG);
+        this.paintArrive.setColor(Color.parseColor("#2ECC71"));
 
-        // Jaune semi-transparent pendant le tracé
-        paintCheminDessin = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paintCheminDessin.setColor(Color.parseColor("#FFEB3B"));
-        paintCheminDessin.setStyle(Paint.Style.FILL);
-        paintCheminDessin.setAlpha(160);
+        this.paintDepart = new Paint(Paint.ANTI_ALIAS_FLAG);
+        this.paintDepart.setColor(Color.parseColor("#E67E22"));
+        this.paintDepart.setAlpha(120);
 
-        // Or plein quand le chemin est validé
-        paintCheminValide = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paintCheminValide.setColor(Color.parseColor("#FFC107"));
-        paintCheminValide.setStyle(Paint.Style.FILL);
-        paintCheminValide.setAlpha(200);
+        this.paintCheminDessin = new Paint(Paint.ANTI_ALIAS_FLAG);
+        this.paintCheminDessin.setColor(Color.parseColor("#FFEB3B"));
+        this.paintCheminDessin.setAlpha(160);
+
+        this.paintCheminValide = new Paint(Paint.ANTI_ALIAS_FLAG);
+        this.paintCheminValide.setColor(Color.parseColor("#FFC107"));
+        this.paintCheminValide.setAlpha(200);
     }
 
-    public void setNiveau(Niveau niveau) { this.niveau = niveau; effacerChemin(); invalidate(); }
-    public void setJoueur(Joueur joueur) { this.joueur = joueur; }
 
+    /*-------------------------------------------*/
+    /*                 Accesseurs                */
+    /*-------------------------------------------*/
+
+    public void setEcouteDessin(EcouteDessin e)
+    {
+        this.ecouteDessin = e;
+    }
+
+    public void setNiveau(Niveau niveau)
+    {
+        this.niveau = niveau;
+        this.effacerChemin();
+        this.invalidate();
+    }
+
+    public void setJoueur(Joueur joueur)
+    {
+        this.joueur = joueur;
+    }
+
+    public List<int[]> getCheminValide()
+    {
+        if (this.cheminValide)
+        {
+            return new ArrayList<>(this.chemin);
+        }
+
+        return null;
+    }
+
+
+    /*-------------------------------------------*/
+    /*               Gestion chemin              */
+    /*-------------------------------------------*/
 
     public void effacerChemin()
     {
@@ -114,80 +152,119 @@ public class VueLabyrinthe extends View
         this.invalidate();
     }
 
-    public List<int[]> getCheminValide()
-    {
-        return this.cheminValide ? new ArrayList<>(this.chemin) : null;
-    }
 
-    // ------------------------------------------------------------------ touch
+    /*-------------------------------------------*/
+    /*              Gestion tactile              */
+    /*-------------------------------------------*/
+
     @Override
     public boolean onTouchEvent(MotionEvent event)
     {
-        if (this.niveau == null || this.joueur == null) return false;
+        if (this.niveau == null || this.joueur == null)
+        {
+            return false;
+        }
 
         float largeurCase = (float) this.getWidth()  / this.niveau.getLargeur();
         float hauteurCase = (float) this.getHeight() / this.niveau.getHauteur();
 
-        int colTouche   = (int)(event.getX() / largeurCase);
-        int ligneTouche = (int)(event.getY() / hauteurCase);
-
-        // Clamp pour rester dans la grille
-        colTouche   = Math.max(0, Math.min(colTouche,   this.niveau.getLargeur()  - 1));
-        ligneTouche = Math.max(0, Math.min(ligneTouche, this.niveau.getHauteur() - 1));
+        int col   = Math.max(0, Math.min((int)(event.getX() / largeurCase), this.niveau.getLargeur() - 1));
+        int ligne = Math.max(0, Math.min((int)(event.getY() / hauteurCase), this.niveau.getHauteur() - 1));
 
         switch (event.getAction())
         {
             case MotionEvent.ACTION_DOWN:
-                this.onDoigtPose(colTouche, ligneTouche);
+            {
+                this.onDoigtPose(col, ligne);
                 break;
+            }
 
             case MotionEvent.ACTION_MOVE:
-                if (this.enDessin) this.onDoigtBouge(colTouche, ligneTouche);
+            {
+                if (this.enDessin)
+                {
+                    this.onDoigtBouge(col, ligne);
+                }
                 break;
+            }
 
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                if (this.enDessin) this.onDoigtRelache();
+            {
+                if (this.enDessin)
+                {
+                    this.onDoigtRelache();
+                }
                 break;
+            }
         }
-        return true;
+
+        return this.enDessin || this.cheminValide;
     }
+
+
+    /*-------------------------------------------*/
+    /*             Gestion du dessin             */
+    /*-------------------------------------------*/
 
     private void onDoigtPose(int col, int ligne)
     {
-        int casJoueurCol   = (int) Math.round(this.joueur.getPosX());
-        int casJoueurLigne = (int) Math.round(this.joueur.getPosY());
+        int joueurCol   = (int) Math.floor(this.joueur.getPosX());
+        int joueurLigne = (int) Math.floor(this.joueur.getPosY());
 
-        if (col != casJoueurCol || ligne != casJoueurLigne) return;
+        if (col != joueurCol || ligne != joueurLigne)
+        {
+            return;
+        }
 
-        if (this.niveau.estMur(col, ligne)) return;
+        if (this.niveau.estMur(col, ligne))
+        {
+            return;
+        }
 
         this.enDessin     = true;
         this.cheminValide = false;
         this.chemin.clear();
         this.chemin.add(new int[]{col, ligne});
 
-        if (this.ecouteDessin != null) this.ecouteDessin.onDebutDessin();
+        if (this.ecouteDessin != null)
+        {
+            this.ecouteDessin.onDebutDessin();
+        }
+
         this.invalidate();
     }
 
     private void onDoigtBouge(int col, int ligne)
     {
-        if (this.niveau.estMur(col, ligne)) return;
+        if (this.niveau.estMur(col, ligne))
+        {
+            return;
+        }
 
         if (!this.chemin.isEmpty())
         {
             int[] derniere = this.chemin.get(this.chemin.size() - 1);
-            if (derniere[0] == col && derniere[1] == ligne) return;
-        }
 
-        if (this.chemin.size() >= 2)
-        {
-            int[] avantDerniere = this.chemin.get(this.chemin.size() - 2);
-            if (avantDerniere[0] == col && avantDerniere[1] == ligne)
+            if (derniere[0] == col && derniere[1] == ligne)
             {
-                this.chemin.remove(this.chemin.size() - 1);
-                this.invalidate();
+                return;
+            }
+
+            if (this.chemin.size() >= 2)
+            {
+                int[] avant = this.chemin.get(this.chemin.size() - 2);
+
+                if (avant[0] == col && avant[1] == ligne)
+                {
+                    this.chemin.remove(this.chemin.size() - 1);
+                    this.invalidate();
+                    return;
+                }
+            }
+
+            if (Math.abs(col - derniere[0]) + Math.abs(ligne - derniere[1]) != 1)
+            {
                 return;
             }
         }
@@ -200,50 +277,70 @@ public class VueLabyrinthe extends View
     {
         this.enDessin = false;
 
-        if (this.chemin.isEmpty()) return;
+        if (this.chemin.isEmpty())
+        {
+            return;
+        }
 
-        // Vérifier si la dernière case du chemin est l'arrivée
         int[] derniere = this.chemin.get(this.chemin.size() - 1);
-        boolean attentArrivee = derniere[0] == this.niveau.getPosXArriver()
-                && derniere[1] == this.niveau.getPosYArriver();
 
-        if (attentArrivee)
+        boolean atteint =
+                derniere[0] == this.niveau.getPosXArriver() &&
+                        derniere[1] == this.niveau.getPosYArriver();
+
+        if (atteint)
         {
             this.cheminValide = true;
-            if (this.ecouteDessin != null) this.ecouteDessin.onFinDessinValide();
+
+            if (this.ecouteDessin != null)
+            {
+                this.ecouteDessin.onFinDessinValide();
+            }
         }
         else
         {
-            this.cheminValide = false;
             this.chemin.clear();
-            if (this.ecouteDessin != null) this.ecouteDessin.onFinDessinInvalide();
+
+            if (this.ecouteDessin != null)
+            {
+                this.ecouteDessin.onFinDessinInvalide();
+            }
         }
 
         this.invalidate();
     }
 
+
+    /*-------------------------------------------*/
+    /*                 Dessin                    */
+    /*-------------------------------------------*/
+
     @Override
     protected void onDraw(Canvas canvas)
     {
         super.onDraw(canvas);
-        if (this.niveau == null || this.joueur == null) return;
 
-        final float largeurCase = (float) getWidth()  / this.niveau.getLargeur();
-        final float hauteurCase = (float) getHeight() / this.niveau.getHauteur();
-
-        // 1. Grille
-        for (int ligne = 0; ligne < this.niveau.getHauteur(); ligne++)
+        if (this.niveau == null || this.joueur == null)
         {
-            for (int col = 0; col < this.niveau.getLargeur(); col++)
+            return;
+        }
+
+        float largeurCase = (float) this.getWidth()  / this.niveau.getLargeur();
+        float hauteurCase = (float) this.getHeight() / this.niveau.getHauteur();
+
+        for (int y = 0; y < this.niveau.getHauteur(); y++)
+        {
+            for (int x = 0; x < this.niveau.getLargeur(); x++)
             {
-                float g = col   * largeurCase;
-                float h = ligne * hauteurCase;
+                float g = x * largeurCase;
+                float h = y * hauteurCase;
+
                 this.rectTemp.set(g, h, g + largeurCase, h + hauteurCase);
 
-                if (this.niveau.estMur(col, ligne))
+                if (this.niveau.estMur(x, y))
                 {
-                    canvas.drawRect(this.rectTemp, paintMur);
-                    canvas.drawRect(this.rectTemp, paintBordureMur);
+                    canvas.drawRect(this.rectTemp, this.paintMur);
+                    canvas.drawRect(this.rectTemp, this.paintBordureMur);
                 }
                 else
                 {
@@ -252,35 +349,40 @@ public class VueLabyrinthe extends View
             }
         }
 
-        // 2. Case départ
+        // Départ
         float dpx = this.niveau.getPosXJoueur() * largeurCase;
         float dpy = this.niveau.getPosYJoueur() * hauteurCase;
+
         this.rectTemp.set(dpx, dpy, dpx + largeurCase, dpy + hauteurCase);
         canvas.drawRect(this.rectTemp, this.paintDepart);
 
-        // 3. Chemin (dessin en cours ou validé)
+        // Chemin
         if (!this.chemin.isEmpty())
         {
             Paint p = this.cheminValide ? this.paintCheminValide : this.paintCheminDessin;
-            for (int[] caseChemin : this.chemin)
+
+            for (int[] c : this.chemin)
             {
-                float cx = caseChemin[0] * largeurCase;
-                float cy = caseChemin[1] * hauteurCase;
-                // Légèrement inséré dans la case pour bien voir les bords
+                float cx = c[0] * largeurCase;
+                float cy = c[1] * hauteurCase;
+
                 this.rectTemp.set(cx + 2, cy + 2, cx + largeurCase - 2, cy + hauteurCase - 2);
                 canvas.drawRect(this.rectTemp, p);
             }
         }
 
-        // 4. Arrivée (dessinée après le chemin pour rester visible)
-        float ax = this.niveau.getPosXArriver() * largeurCase + largeurCase / 2f;
-        float ay = this.niveau.getPosYArriver() * hauteurCase + hauteurCase / 2f;
+        // Arrivée
+        float ax = (this.niveau.getPosXArriver() + 0.5f) * largeurCase;
+        float ay = (this.niveau.getPosYArriver() + 0.5f) * hauteurCase;
+
         canvas.drawCircle(ax, ay, Math.min(largeurCase, hauteurCase) / 2.8f, this.paintArrive);
 
-        // 5. Boule joueur
-        float px    = (float)(this.joueur.getPosX() * largeurCase + largeurCase / 2.0);
-        float py    = (float)(this.joueur.getPosY() * hauteurCase + hauteurCase / 2.0);
+        // Joueur
+        float px = (float)(this.joueur.getPosX() * largeurCase);
+        float py = (float)(this.joueur.getPosY() * hauteurCase);
+
         float rayon = (float)(MetierLabyrinthe.RAYON_BOULE * Math.min(largeurCase, hauteurCase));
+
         canvas.drawCircle(px, py, rayon, this.paintJoueur);
     }
 }

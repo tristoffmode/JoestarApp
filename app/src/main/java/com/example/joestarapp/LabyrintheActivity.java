@@ -11,124 +11,208 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.example.joestarapp.labyrinthe.view.ParametresActivity;
 import com.example.joestarapp.labyrinthe.model.sauvegarde.GestionSauvegarde;
 import com.example.joestarapp.labyrinthe.view.JeuLabyrintheActivity;
 
+/**
+ * Activité principale du mode Labyrinthe.
+ * Permet de choisir un niveau, accéder aux paramètres ou quitter.
+ */
 public class LabyrintheActivity extends AppCompatActivity
 {
-    // Nombre total de niveaux — changer uniquement cette constante pour en ajouter
-    private static final int NOMBRE_NIVEAUX = 5;
+    /*-------------------------------------------*/
+    /*                 Constantes                */
+    /*-------------------------------------------*/
 
-    private Button           boutonQuitter;
-    private Button           boutonParametres;
-    private LinearLayout     conteneurNiveaux;
+    private static final int LabyrintheActivity_NOMBRE_NIVEAUX = 7;
+
+
+    /*-------------------------------------------*/
+    /*             Attributs d'instance          */
+    /*-------------------------------------------*/
+
+    private Button            boutonQuitter;
+    private Button            boutonParametres;
+    private LinearLayout      conteneurNiveaux;
     private GestionSauvegarde sauvegarde;
+
+
+    /*-------------------------------------------*/
+    /*                Cycle de vie               */
+    /*-------------------------------------------*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_labyrinthe);
+        this.setContentView(R.layout.activity_labyrinthe);
 
-        this.sauvegarde      = new GestionSauvegarde(this);
-        this.conteneurNiveaux = findViewById(R.id.conteneurNiveaux);
-        this.boutonParametres = findViewById(R.id.boutonParametres);
-        this.boutonQuitter    = findViewById(R.id.boutonQuitter);
+        this.sauvegarde       = new GestionSauvegarde(this);
+        this.conteneurNiveaux = this.findViewById(R.id.conteneurNiveaux);
+        this.boutonParametres = this.findViewById(R.id.boutonParametres);
+        this.boutonQuitter    = this.findViewById(R.id.boutonQuitter);
 
-        boutonParametres.setOnClickListener(v ->
-                Toast.makeText(this, getString(R.string.toast_parametres_bientot), Toast.LENGTH_SHORT).show());
+        this.boutonParametres.setOnClickListener(v ->
+        {
+            this.startActivity(new Intent(this, ParametresActivity.class));
+        });
 
-        boutonQuitter.setOnClickListener(v -> finish());
+        this.boutonQuitter.setOnClickListener(v ->
+        {
+            this.finish();
+        });
 
-        construireBoutonsNiveaux();
+        this.construireBoutonsNiveaux();
     }
 
     @Override
     protected void onResume()
     {
         super.onResume();
-        // Rafraîchit les boutons à chaque retour (ex: après avoir terminé un niveau)
-        construireBoutonsNiveaux();
+
+        // Rafraîchir les boutons (ex : retour après un niveau)
+        this.construireBoutonsNiveaux();
     }
 
-    /**
-     * Génère dynamiquement les boutons de niveaux.
-     * Modulaire : ajoute un fichier niveau6.txt et change NOMBRE_NIVEAUX = 6.
-     */
+
+    /*-------------------------------------------*/
+    /*               Méthodes privées            */
+    /*-------------------------------------------*/
+
     private void construireBoutonsNiveaux()
     {
-        conteneurNiveaux.removeAllViews();
+        this.conteneurNiveaux.removeAllViews();
 
-        int niveauDebloque = sauvegarde.getNiveauDebloque();
+        int niveauDebloque = this.sauvegarde.getNiveauDebloque();
 
-        for (int i = 1; i <= NOMBRE_NIVEAUX; i++)
+        for (int i = 1; i <= LabyrintheActivity_NOMBRE_NIVEAUX; i++)
         {
-            final int numNiveau  = i;
-            boolean   debloque   = (i <= niveauDebloque);
-            boolean   reussi     = sauvegarde.estNiveauReussi(i);
-            int       meilleurScore = sauvegarde.getMeilleurScore(i);
+            final int numNiveau = i;
+
+            boolean debloque     = (i <= niveauDebloque);
+            boolean reussi       = this.sauvegarde.estNiveauReussi(i);
+            int     meilleurScore = this.sauvegarde.getMeilleurScore(i);
 
             Button bouton = new Button(this);
 
-            // Texte du bouton
-            String texte = getString(R.string.bouton_niveau_prefix) + i;
-            if (reussi)   texte += "  ✓";
-            if (!debloque) texte = "🔒  " + getString(R.string.bouton_niveau_prefix) + i;
+            /*-------------------------------------------*/
+            /*                Texte bouton               */
+            /*-------------------------------------------*/
+
+            String texte = this.getString(R.string.bouton_niveau_prefix) + i;
+
+            if (reussi)
+            {
+                texte += "  Réussi";
+            }
+
+            if (!debloque)
+            {
+                texte = this.getString(R.string.bouton_niveau_prefix) + i + " est verrouillé";
+            }
+
             bouton.setText(texte);
 
-            // Style selon l'état
+
+            /*-------------------------------------------*/
+            /*                  Style                   */
+            /*-------------------------------------------*/
+
             bouton.setTextColor(ContextCompat.getColor(this, android.R.color.white));
             bouton.setAllCaps(false);
             bouton.setEnabled(debloque);
 
             if (reussi)
-                bouton.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.niveau_reussi));
-            else if (debloque)
-                bouton.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.niveau_debloque));
-            else
-                bouton.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.niveau_verrouille));
-
-            // Marges
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
-            params.setMargins(0, 0, 0, 16);
-            bouton.setLayoutParams(params);
-
-            // Score si déjà réussi
-            if (reussi && meilleurScore > 0)
             {
-                TextView scoreView = new TextView(this);
-                scoreView.setText(getString(R.string.label_meilleur_score) + " " + meilleurScore + " pts");
-                scoreView.setTextColor(ContextCompat.getColor(this, android.R.color.darker_gray));
-                scoreView.setTextSize(12f);
-                scoreView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-                LinearLayout.LayoutParams sparams = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                sparams.setMargins(0, -12, 0, 16);
-                scoreView.setLayoutParams(sparams);
-
-                bouton.setOnClickListener(v -> lancerNiveau(numNiveau));
-                conteneurNiveaux.addView(bouton);
-                conteneurNiveaux.addView(scoreView);
+                bouton.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.niveau_reussi));
+            }
+            else if (debloque)
+            {
+                bouton.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.niveau_debloque));
             }
             else
             {
-                bouton.setOnClickListener(v -> {
-                    if (debloque) lancerNiveau(numNiveau);
-                    else Toast.makeText(this, getString(R.string.toast_niveau_verrouille), Toast.LENGTH_SHORT).show();
+                bouton.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.niveau_verrouille));
+            }
+
+
+            /*-------------------------------------------*/
+            /*                  Layout                  */
+            /*-------------------------------------------*/
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+
+            params.setMargins(0, 0, 0, 16);
+            bouton.setLayoutParams(params);
+
+
+            /*-------------------------------------------*/
+            /*           Gestion du score affiché       */
+            /*-------------------------------------------*/
+
+            if (reussi && meilleurScore > 0)
+            {
+                TextView scoreView = new TextView(this);
+
+                scoreView.setText(
+                        this.getString(R.string.label_meilleur_score) + " " + meilleurScore + " pts"
+                );
+
+                scoreView.setTextColor(ContextCompat.getColor(this, android.R.color.darker_gray));
+                scoreView.setTextSize(12f);
+                scoreView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+
+                LinearLayout.LayoutParams sparams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+
+                sparams.setMargins(0, -12, 0, 16);
+                scoreView.setLayoutParams(sparams);
+
+                bouton.setOnClickListener(v ->
+                {
+                    this.lancerNiveau(numNiveau);
                 });
-                conteneurNiveaux.addView(bouton);
+
+                this.conteneurNiveaux.addView(bouton);
+                this.conteneurNiveaux.addView(scoreView);
+            }
+            else
+            {
+                bouton.setOnClickListener(v ->
+                {
+                    if (debloque)
+                    {
+                        this.lancerNiveau(numNiveau);
+                    }
+                    else
+                    {
+                        Toast.makeText(
+                                this,
+                                this.getString(R.string.toast_niveau_verrouille),
+                                Toast.LENGTH_SHORT
+                        ).show();
+                    }
+                });
+
+                this.conteneurNiveaux.addView(bouton);
             }
         }
     }
 
+
     private void lancerNiveau(int numNiveau)
     {
         Intent intent = new Intent(this, JeuLabyrintheActivity.class);
+
         intent.putExtra(JeuLabyrintheActivity.CLE_NIVEAU, numNiveau);
-        intent.putExtra(JeuLabyrintheActivity.CLE_NOMBRE_NIVEAUX, NOMBRE_NIVEAUX);
-        startActivity(intent);
+        intent.putExtra(JeuLabyrintheActivity.CLE_NOMBRE_NIVEAUX, LabyrintheActivity_NOMBRE_NIVEAUX);
+
+        this.startActivity(intent);
     }
 }

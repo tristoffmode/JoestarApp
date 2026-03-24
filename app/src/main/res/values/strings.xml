@@ -5,9 +5,9 @@
     <!-- activity_labyrinthe -->
     <string name="titreJeu">Laby Chaos</string>
     <string name="sous_titre">Inclinez pour naviguer</string>
-    <string name="bouton_jouer">▶  JOUER</string>
-    <string name="bouton_parametres">⚙  PARAMÈTRES</string>
-    <string name="bouton_quitter">✕  QUITTER</string>
+    <string name="bouton_jouer">JOUER</string>
+    <string name="bouton_parametres">PARAMÈTRES</string>
+    <string name="bouton_quitter">QUITTER</string>
     <string name="bouton_niveau_prefix">Niveau </string>
     <string name="label_meilleur_score">Meilleur score :</string>
 
@@ -38,8 +38,17 @@
     <string name="dialog_menu">Menu</string>
     <string name="dialog_menu_principal">Menu principal</string>
     <string name="dialog_titre_fin">Félicitations !</string>
+
     <!-- Dessin de chemin -->
     <string name="toast_dessin_debut">Dessinez votre chemin</string>
     <string name="toast_dessin_valide">Chemin valide ! La boule suit le chemin…</string>
     <string name="toast_dessin_invalide">Chemin invalide, réessayez</string>
+
+    <!-- Paramètres -->
+    <string name="titre_parametres">Paramètres</string>
+    <string name="param_vibration_titre">Vibration</string>
+    <string name="param_vibration_desc">Vibrer lors des collisions</string>
+    <string name="param_capteur_titre">Capteur de mouvement</string>
+    <string name="param_capteur_desc">Déplacer la boule en inclinant le téléphone</string>
+    <string name="bouton_retour_parametres">← Retour</string>
 </resources>

@@ -7,10 +7,20 @@ import com.example.joestarapp.labyrinthe.model.entite.Joueur;
 import com.example.joestarapp.labyrinthe.model.lectureFichier.LectureLabyrinthe;
 import com.example.joestarapp.labyrinthe.model.entite.Niveau;
 import com.example.joestarapp.labyrinthe.model.entite.Score;
+import com.example.joestarapp.labyrinthe.model.sauvegarde.GestionPreferences;
 import com.example.joestarapp.labyrinthe.model.sauvegarde.GestionSauvegarde;
 
+/**
+ * Gère toute la logique métier du labyrinthe :
+ * chargement des niveaux, gestion du joueur, collisions,
+ * chronomètre, score et préférences.
+ */
 public class MetierLabyrinthe
 {
+    /*-------------------------------------------*/
+    /*             Attributs d'instance          */
+    /*-------------------------------------------*/
+
     private Joueur joueur;
     private Niveau niveau;
     private Score  score;
@@ -18,177 +28,239 @@ public class MetierLabyrinthe
     private int  niveauCourant;
     private long temps;
 
-    private final Context           context;
-    private final GestionSauvegarde sauvegarde;
+    private final Context            context;
+    private final GestionSauvegarde  sauvegarde;
+    private final GestionPreferences preferences;
 
-    private static final double SENSIBILITE      = 0.008;
-    private static final double SEUIL_REPOS      = 0.8;
-    private static final double VITESSE_MAX      = 0.18;
+    private static final double SENSIBILITE        = 0.025;
+    private static final double VITESSE_MAX        = 0.12;
+    public  static final double RAYON_BOULE        = 0.25;
 
-    // Rayon de la boule en unités de case (0.4 = la boule occupe 80% d'une case)
-    // C'est cette valeur qui empêche la boule d'entrer dans les murs
-    public static final double RAYON_BOULE       = 0.4;
+    private static final long DELAI_VIBRATION_MS   = 200;
+    private long              dernierTempsVibration = 0;
 
-    private static final long DELAI_VIBRATION_MS = 200;
-    private long dernierTempsVibration           = 0;
 
+    /*-------------------------------------------*/
+    /*                Constructeurs              */
+    /*-------------------------------------------*/
+
+    /**
+     * Constructeur par défaut : commence au niveau 1.
+     *
+     * @param context Contexte Android.
+     */
     public MetierLabyrinthe(Context context)
     {
         this.context       = context;
         this.sauvegarde    = new GestionSauvegarde(context);
+        this.preferences   = new GestionPreferences(context);
         this.niveauCourant = 1;
-        chargerNiveau(niveauCourant);
+        this.chargerNiveau(this.niveauCourant);
     }
 
+    /**
+     * Constructeur permettant de choisir le niveau de départ.
+     *
+     * @param context      Contexte Android.
+     * @param niveauDepart Niveau initial.
+     */
     public MetierLabyrinthe(Context context, int niveauDepart)
     {
         this.context       = context;
         this.sauvegarde    = new GestionSauvegarde(context);
+        this.preferences   = new GestionPreferences(context);
         this.niveauCourant = niveauDepart;
-        chargerNiveau(niveauCourant);
+        this.chargerNiveau(this.niveauCourant);
     }
 
-    public Joueur            getJoueur()        { return this.joueur;        }
-    public Niveau            getNiveau()        { return this.niveau;        }
-    public Score             getScore()         { return this.score;         }
-    public int               getNiveauCourant() { return this.niveauCourant; }
-    public GestionSauvegarde getSauvegarde()    { return this.sauvegarde;    }
 
+    /*-------------------------------------------*/
+    /*                 Accesseurs                */
+    /*-------------------------------------------*/
+
+    public Joueur             getJoueur()        { return this.joueur;        }
+    public Niveau             getNiveau()        { return this.niveau;        }
+    public Score              getScore()         { return this.score;         }
+    public int                getNiveauCourant() { return this.niveauCourant; }
+    public GestionSauvegarde  getSauvegarde()    { return this.sauvegarde;    }
+    public GestionPreferences getPreferences()   { return this.preferences;   }
+
+
+    /*-------------------------------------------*/
+    /*               Autres Mehtodes             */
+    /*-------------------------------------------*/
+
+    /**
+     * Charge un niveau depuis un fichier texte.
+     *
+     * @param numNiveau Numéro du niveau à charger.
+     */
     public void chargerNiveau(int numNiveau)
     {
         String nomFichier = "niveau" + numNiveau + ".txt";
         char[][] grille   = LectureLabyrinthe.initNiveau(this.context, nomFichier);
 
         if (grille == null)
+        {
             throw new RuntimeException("Fichier niveau introuvable : " + nomFichier);
+        }
 
         this.niveau = new Niveau(grille);
-        this.joueur = new Joueur(this.niveau.getPosXJoueur(), this.niveau.getPosYJoueur());
+        this.joueur = new Joueur(
+                this.niveau.getPosXJoueur() + 0.5,
+                this.niveau.getPosYJoueur() + 0.5
+        );
 
         if (this.score == null)
+        {
             this.score = new Score(numNiveau);
+        }
 
         this.demarrerChronometre();
     }
 
-    public void gererDeplacementCapteur(double x, double y)
+    /**
+     * Applique l'accélération provenant du capteur.
+     *
+     * @param capteurX Valeur du capteur sur X.
+     * @param capteurY Valeur du capteur sur Y.
+     */
+    public void gererDeplacementCapteur(double capteurX, double capteurY)
     {
-        double ax = 0;
-        double ay = 0;
-        if (Math.abs(x) > SEUIL_REPOS) ax = -x * SENSIBILITE;
-        if (Math.abs(y) > SEUIL_REPOS) ay =  y * SENSIBILITE;
+        if (!this.preferences.isCapteurActif())
+        {
+            return;
+        }
+
+        double ax = capteurY * MetierLabyrinthe.SENSIBILITE;
+        double ay = capteurX * MetierLabyrinthe.SENSIBILITE;
+
         this.joueur.setAcceleration(ax, ay);
     }
 
     /**
-     * Physique + collisions avec prise en compte du rayon de la boule.
-     *
-     * La boule est traitée comme un cercle de rayon RAYON_BOULE.
-     * Pour chaque axe, on teste les 4 coins du carré englobant la boule
-     * afin qu'elle ne puisse jamais chevaucher un mur.
+     * Met à jour la physique du joueur et gère les collisions.
      */
     public void mettreAJourPhysique()
     {
         double ancienX = this.joueur.getPosX();
         double ancienY = this.joueur.getPosY();
 
-        this.joueur.update(VITESSE_MAX);
+        this.joueur.update(MetierLabyrinthe.VITESSE_MAX);
 
         double nouveauX = this.joueur.getPosX();
         double nouveauY = this.joueur.getPosY();
 
         boolean collision = false;
 
-        // --- Collision axe X ---
-        // On teste les deux côtés horizontaux de la boule avec l'ancienne Y
-        if (estEnCollisionX(nouveauX, ancienY))
+        if (this.estEnCollisionX(nouveauX, ancienY))
         {
             nouveauX  = ancienX;
             this.joueur.stopX();
             collision = true;
         }
 
-        // --- Collision axe Y ---
-        // On teste les deux côtés verticaux avec la X corrigée
-        if (estEnCollisionY(nouveauX, nouveauY))
+        if (this.estEnCollisionY(nouveauX, nouveauY))
         {
             nouveauY  = ancienY;
             this.joueur.stopY();
             collision = true;
         }
 
-        // Bornes absolues de la grille (marge = rayon)
-        nouveauX = Math.max(RAYON_BOULE, Math.min(nouveauX, this.niveau.getLargeur()  - 1 - RAYON_BOULE));
-        nouveauY = Math.max(RAYON_BOULE, Math.min(nouveauY, this.niveau.getHauteur() - 1 - RAYON_BOULE));
+        nouveauX = Math.max(MetierLabyrinthe.RAYON_BOULE,
+                Math.min(nouveauX, this.niveau.getLargeur() - 1 - MetierLabyrinthe.RAYON_BOULE));
+
+        nouveauY = Math.max(MetierLabyrinthe.RAYON_BOULE,
+                Math.min(nouveauY, this.niveau.getHauteur() - 1 - MetierLabyrinthe.RAYON_BOULE));
 
         this.joueur.setPosition(nouveauX, nouveauY);
 
-        if (collision)
+        if (collision
+                && this.preferences.isVibrationActive()
+                && (Math.abs(this.joueur.getVitesseX()) > 0.001
+                || Math.abs(this.joueur.getVitesseY()) > 0.001))
         {
             long maintenant = System.currentTimeMillis();
-            if (maintenant - dernierTempsVibration > DELAI_VIBRATION_MS)
+
+            if (maintenant - this.dernierTempsVibration > MetierLabyrinthe.DELAI_VIBRATION_MS)
             {
-                Vibration.vibrer(context, 60);
-                dernierTempsVibration = maintenant;
+                Vibration.vibrer(this.context, 60);
+                this.dernierTempsVibration = maintenant;
             }
         }
     }
 
-    /**
-     * Vérifie si la boule touche un mur sur l'axe X.
-     * On teste le bord gauche (cx - rayon) et le bord droit (cx + rayon).
-     */
     private boolean estEnCollisionX(double cx, double cy)
     {
-        int ligneHaut = (int)(cy - RAYON_BOULE);
-        int ligneBas  = (int)(cy + RAYON_BOULE);
+        int ligneHaut = (int) Math.floor(cy - MetierLabyrinthe.RAYON_BOULE);
+        int ligneBas  = (int) Math.floor(cy + MetierLabyrinthe.RAYON_BOULE);
+        int colGauche = (int) Math.floor(cx - MetierLabyrinthe.RAYON_BOULE);
+        int colDroite = (int) Math.floor(cx + MetierLabyrinthe.RAYON_BOULE);
 
-        // Bord gauche
-        int colGauche = (int)(cx - RAYON_BOULE);
-        if (estMurSur(colGauche, ligneHaut) || estMurSur(colGauche, ligneBas)) return true;
+        if (this.estMurSur(colGauche, ligneHaut) || this.estMurSur(colGauche, ligneBas))
+        {
+            return true;
+        }
 
-        // Bord droit
-        int colDroite = (int)(cx + RAYON_BOULE);
-        if (estMurSur(colDroite, ligneHaut) || estMurSur(colDroite, ligneBas)) return true;
+        if (this.estMurSur(colDroite, ligneHaut) || this.estMurSur(colDroite, ligneBas))
+        {
+            return true;
+        }
 
         return false;
     }
 
-    /**
-     * Vérifie si la boule touche un mur sur l'axe Y.
-     * On teste le bord haut (cy - rayon) et le bord bas (cy + rayon).
-     */
     private boolean estEnCollisionY(double cx, double cy)
     {
-        int colGauche = (int)(cx - RAYON_BOULE);
-        int colDroite = (int)(cx + RAYON_BOULE);
+        int colGauche = (int) Math.floor(cx - MetierLabyrinthe.RAYON_BOULE);
+        int colDroite = (int) Math.floor(cx + MetierLabyrinthe.RAYON_BOULE);
+        int ligneHaut = (int) Math.floor(cy - MetierLabyrinthe.RAYON_BOULE);
+        int ligneBas  = (int) Math.floor(cy + MetierLabyrinthe.RAYON_BOULE);
 
-        // Bord haut
-        int ligneHaut = (int)(cy - RAYON_BOULE);
-        if (estMurSur(colGauche, ligneHaut) || estMurSur(colDroite, ligneHaut)) return true;
+        if (this.estMurSur(colGauche, ligneHaut) || this.estMurSur(colDroite, ligneHaut))
+        {
+            return true;
+        }
 
-        // Bord bas
-        int ligneBas = (int)(cy + RAYON_BOULE);
-        if (estMurSur(colGauche, ligneBas) || estMurSur(colDroite, ligneBas)) return true;
+        if (this.estMurSur(colGauche, ligneBas) || this.estMurSur(colDroite, ligneBas))
+        {
+            return true;
+        }
 
         return false;
     }
 
-    /** Vérifie qu'une case est dans la grille ET est un mur. */
     private boolean estMurSur(int col, int ligne)
     {
-        if (col  < 0 || col  >= this.niveau.getLargeur())  return true; // hors grille = mur
-        if (ligne < 0 || ligne >= this.niveau.getHauteur()) return true;
+        if (col < 0 || col >= this.niveau.getLargeur())
+        {
+            return true;
+        }
+
+        if (ligne < 0 || ligne >= this.niveau.getHauteur())
+        {
+            return true;
+        }
+
         return this.niveau.estMur(col, ligne);
     }
 
+    /**
+     * Vérifie si le joueur a atteint la zone d'arrivée.
+     *
+     * @return true si le joueur est dans la zone d'arrivée.
+     */
     public boolean aGagne()
     {
-        double epsilon = 0.5;
-        return Math.abs(this.joueur.getPosX() - this.niveau.getPosXArriver()) < epsilon
-                && Math.abs(this.joueur.getPosY() - this.niveau.getPosYArriver()) < epsilon;
+        double epsilon = 0.6;
+
+        return Math.abs(this.joueur.getPosX() - (this.niveau.getPosXArriver() + 0.5)) < epsilon
+                && Math.abs(this.joueur.getPosY() - (this.niveau.getPosYArriver() + 0.5)) < epsilon;
     }
 
+    /**
+     * Enregistre le temps écoulé dans le score.
+     */
     public void enregistrerTemps()
     {
         long tempsEcoule = System.currentTimeMillis() - this.temps;
@@ -196,25 +268,37 @@ public class MetierLabyrinthe
         this.score.calculerPointBonus(60000);
     }
 
+    /**
+     * Sauvegarde la victoire du joueur.
+     */
     public void sauvegarderVictoire()
     {
-        sauvegarde.marquerNiveauReussi(niveauCourant);
-        sauvegarde.sauvegarderScore(niveauCourant, score.getPoints());
+        this.sauvegarde.marquerNiveauReussi(this.niveauCourant);
+        this.sauvegarde.sauvegarderScore(this.niveauCourant, this.score.getPoints());
     }
 
+    /**
+     * Démarre le chronomètre du niveau.
+     */
     public void demarrerChronometre()
     {
         this.temps = System.currentTimeMillis();
     }
 
+    /**
+     * @return Le temps écoulé depuis le début du niveau.
+     */
     public long getTempsEcouleMs()
     {
         return System.currentTimeMillis() - this.temps;
     }
 
+    /**
+     * Passe au niveau suivant.
+     */
     public void niveauSuivant()
     {
         this.niveauCourant++;
-        chargerNiveau(this.niveauCourant);
+        this.chargerNiveau(this.niveauCourant);
     }
 }

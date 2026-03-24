@@ -8,11 +8,30 @@ import android.hardware.SensorManager;
 
 import com.example.joestarapp.labyrinthe.model.capteur.interfaces.IEcouteDeplacement;
 
+/**
+ * Gère le capteur de mouvement (accéléromètre).
+ */
 public class CapteurMouvement implements SensorEventListener
 {
-    private SensorManager       sensorManager;
-    private Sensor              accelerometre;
+    /*-------------------------------------------*/
+    /*                 Constantes                */
+    /*-------------------------------------------*/
+
+    private static final String CapteurMouvement_TAG = "CapteurMouvement";
+
+
+    /*-------------------------------------------*/
+    /*             Attributs d'instance          */
+    /*-------------------------------------------*/
+
+    private SensorManager      sensorManager;
+    private Sensor             accelerometre;
     private IEcouteDeplacement ecouteur;
+
+
+    /*-------------------------------------------*/
+    /*                Constructeur               */
+    /*-------------------------------------------*/
 
     public CapteurMouvement(Context context, IEcouteDeplacement ecouteur)
     {
@@ -21,29 +40,51 @@ public class CapteurMouvement implements SensorEventListener
         this.ecouteur      = ecouteur;
     }
 
+
+    /*-------------------------------------------*/
+    /*               Méthodes publiques          */
+    /*-------------------------------------------*/
+
     public void demarrer()
     {
-        if(sensorManager != null && accelerometre != null)
+        if (this.sensorManager != null && this.accelerometre != null)
         {
-            sensorManager.registerListener(this, accelerometre, SensorManager.SENSOR_DELAY_GAME);
+            this.sensorManager.registerListener(
+                    this,
+                    this.accelerometre,
+                    SensorManager.SENSOR_DELAY_GAME
+            );
         }
     }
 
     public void arreter()
     {
-        this.sensorManager.unregisterListener(this);
+        if (this.sensorManager != null)
+        {
+            this.sensorManager.unregisterListener(this);
+        }
     }
 
+
+    /*-------------------------------------------*/
+    /*         Implémentation capteur            */
+    /*-------------------------------------------*/
+
+    @Override
     public void onSensorChanged(SensorEvent e)
     {
         float x = e.values[0];
         float y = e.values[1];
 
-        if(this.ecouteur != null)
+        if (this.ecouteur != null)
         {
-            this.ecouteur.deplacer(x,y);
+            this.ecouteur.deplacer(x, y);
         }
     }
 
-    public void onAccuracyChanged(Sensor sensor,int accuracy) {}
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy)
+    {
+
+    }
 }

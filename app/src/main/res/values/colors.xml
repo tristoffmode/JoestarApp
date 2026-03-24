@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Couleurs de base -->
-    <color name="colorPrimary">#4A90E2</color>
-    <color name="colorBackground">#0D1117</color>
-    <color name="colorTexte">#F0EAD6</color>
-
-    <!-- États des boutons de niveaux -->
-    <color name="niveau_reussi">#2E7D32</color>       <!-- vert foncé : niveau complété -->
-    <color name="niveau_debloque">#1E2A3A</color>     <!-- bleu nuit : disponible -->
-    <color name="niveau_verrouille">#3A3A3A</color>   <!-- gris : verrouillé -->
+    <color name="fond">#0D1117</color>
+    <color name="surface">#151D29</color>
+    <color name="bordure">#1E2A3A</color>
+    <color name="accent">#4A90E2</color>
+    <color name="texte">#F0EAD6</color>
+    <color name="texteFonce">#666666</color>
+    <color name="texteSecondaire">#AAAAAA</color>
+    <color name="danger">#E05252</color>
+    <color name="hud">#CC0D1117</color>
+    <color name="bouton">#CC223F49</color>
+    <color name="niveau_reussi">#2E7D32</color>
+    <color name="niveau_debloque">#1E2A3A</color>
+    <color name="niveau_verrouille">#3A3A3A</color>
 </resources>

@@ -1,34 +1,72 @@
 package com.example.joestarapp.labyrinthe.model.entite;
 
+/**
+ * Représente le score d'un niveau.
+ * Gère les points et le temps du joueur.
+ */
 public class Score
 {
-    private int niveau;
-    private int points;
+    /*-------------------------------------------*/
+    /*             Attributs d'instance          */
+    /*-------------------------------------------*/
 
-    private int temps;
+    private int  niveau;
+    private int  points;
+    private long temps;
+
+
+    /*-------------------------------------------*/
+    /*                Constructeur               */
+    /*-------------------------------------------*/
 
     public Score(int niveau)
     {
         this.niveau = niveau;
-        this.temps  = 0;
         this.points = 0;
+        this.temps  = 0;
     }
 
-    public int getPoints() { return this.points ;}
-    public int getNiveau() { return this.niveau ;}
 
-    public long getTemps() { return this.temps  ;}
+    /*-------------------------------------------*/
+    /*                 Accesseurs                */
+    /*-------------------------------------------*/
+
+    public int getPoints()
+    {
+        return this.points;
+    }
+
+    public int getNiveau()
+    {
+        return this.niveau;
+    }
+
+    public long getTemps()
+    {
+        return this.temps;
+    }
+
+
+    /*-------------------------------------------*/
+    /*               Méthodes métier             */
+    /*-------------------------------------------*/
 
     public int calculerPointBonus(long tempsLimite)
     {
-        int bonus = (int) Math.max(0,(tempsLimite-this.temps)/100);
+        int bonus = (int) Math.max(0, (tempsLimite - this.temps) / 100);
+
         this.ajouterPoints(bonus);
 
         return bonus;
     }
 
-    public void ajouterPoints(int points) { this.points += points ; }
-    public void ajouterTemps (long temps ){ this.temps  += temps  ; }
+    public void ajouterPoints(int points)
+    {
+        this.points += points;
+    }
 
-
+    public void ajouterTemps(long temps)
+    {
+        this.temps += temps;
+    }
 }

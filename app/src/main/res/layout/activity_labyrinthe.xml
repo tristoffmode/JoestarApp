@@ -6,10 +6,9 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0D1117"
+    android:background="@color/fond"
     tools:context=".LabyrintheActivity">
 
-    <!-- Titre -->
     <TextView
         android:id="@+id/titreLabyrinthe"
         android:layout_width="wrap_content"
@@ -17,38 +16,35 @@
         android:text="@string/titreJeu"
         android:textSize="38sp"
         android:textStyle="bold"
-        android:textColor="#F0EAD6"
+        android:textColor="@color/texte"
         android:letterSpacing="0.08"
         android:layout_marginTop="32dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Sous-titre -->
     <TextView
         android:id="@+id/sousTitre"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/sous_titre"
         android:textSize="14sp"
-        android:textColor="#666666"
+        android:textColor="@color/texteFonce"
         android:layout_marginTop="8dp"
         app:layout_constraintTop_toBottomOf="@id/titreLabyrinthe"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Séparateur -->
     <View
         android:id="@+id/separateur"
         android:layout_width="60dp"
         android:layout_height="2dp"
-        android:background="#4A90E2"
+        android:background="@color/accent"
         android:layout_marginTop="16dp"
         app:layout_constraintTop_toBottomOf="@id/sousTitre"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- ScrollView pour les boutons de niveaux -->
     <ScrollView
         android:id="@+id/scrollNiveaux"
         android:layout_width="0dp"
@@ -62,7 +58,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Conteneur généré dynamiquement par LabyrintheActivity -->
         <LinearLayout
             android:id="@+id/conteneurNiveaux"
             android:layout_width="match_parent"
@@ -73,15 +68,14 @@
 
     </ScrollView>
 
-    <!-- Bouton Paramètres -->
     <Button
         android:id="@+id/boutonParametres"
         android:layout_width="220dp"
         android:layout_height="52dp"
         android:text="@string/bouton_parametres"
         android:textSize="14sp"
-        android:textColor="#AAAAAA"
-        android:backgroundTint="#1E2A3A"
+        android:textColor="@color/texteSecondaire"
+        android:backgroundTint="@color/bordure"
         android:stateListAnimator="@null"
         android:layout_marginTop="8dp"
         app:layout_constraintTop_toBottomOf="@id/scrollNiveaux"
@@ -89,15 +83,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/boutonQuitter"/>
 
-    <!-- Bouton Quitter -->
     <Button
         android:id="@+id/boutonQuitter"
         android:layout_width="220dp"
         android:layout_height="52dp"
         android:text="@string/bouton_quitter"
         android:textSize="14sp"
-        android:textColor="#E05252"
-        android:backgroundTint="#1E2A3A"
+        android:textColor="@color/danger"
+        android:backgroundTint="@color/bordure"
         android:stateListAnimator="@null"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="24dp"

@@ -8,8 +8,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Permet de charger un niveau depuis les assets.
+ */
+
 public abstract class LectureLabyrinthe
 {
+
+    /*-------------------------------------------*/
+    /*               Méthodes statiques          */
+    /*-------------------------------------------*/
     public static char[][] initNiveau(Context context,String nomFichier)
     {
         try

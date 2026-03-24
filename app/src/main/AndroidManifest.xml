@@ -13,40 +13,35 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.JoestarApp">
-
+        <activity
+            android:name=".labyrinthe.view.ParametresActivity"
+            android:exported="false" />
         <!-- Jeu labyrinthe : forcé en paysage -->
         <activity
             android:name=".labyrinthe.view.JeuLabyrintheActivity"
-            android:screenOrientation="landscape"
             android:configChanges="orientation|screenSize|keyboardHidden"
-            android:theme="@style/Theme.FullScreen"
-            android:exported="false" />
-
-        <!-- Menu labyrinthe : portrait -->
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.FullScreen" /> <!-- Menu labyrinthe : portrait -->
         <activity
             android:name=".LabyrintheActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
-
-        <!-- Autres activities : inchangées -->
+            android:exported="false"
+            android:screenOrientation="portrait" /> <!-- Autres activities : inchangées -->
         <activity
             android:name=".CompteurActivity"
             android:exported="false" />
-
         <activity
             android:name=".ChronometreActivity"
-            android:exported="false" />
-
-        <!-- Activity principale -->
+            android:exported="false" /> <!-- Activity principale -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>
