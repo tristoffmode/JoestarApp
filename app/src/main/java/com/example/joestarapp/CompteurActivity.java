@@ -7,6 +7,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -21,6 +22,7 @@ public class CompteurActivity extends AppCompatActivity implements SensorEventLi
     private TextView tvPas;
     private ProgressBar barreProgression;
     private Chronometer chronometre;
+    private Button btnRetour;
 
     private int nbPas = 0;
     private boolean pasDetecte = false;
@@ -36,6 +38,12 @@ public class CompteurActivity extends AppCompatActivity implements SensorEventLi
         tvPas = findViewById(R.id.tv_pas);
         barreProgression = findViewById(R.id.barre_progression);
         chronometre = findViewById(R.id.chronometre);
+        btnRetour = findViewById(R.id.btn_retour);
+
+        // Action du bouton retour
+        btnRetour.setOnClickListener(v -> {
+            finish();
+        });
 
         // Initialisation du service de capteurs
         gestionnaireCapteurs = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -76,7 +84,7 @@ public class CompteurActivity extends AppCompatActivity implements SensorEventLi
 
             double magnitude = Math.sqrt(x * x + y * y + z * z);
 
-            // Logique de détection de pas
+            // Logique de détection de pas (hystérésis)
             if (magnitude > SEUIL_PAS && !pasDetecte) {
                 nbPas++;
                 pasDetecte = true;
