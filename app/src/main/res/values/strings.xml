@@ -1,6 +1,6 @@
 <resources>
     <!-- App -->
-    <string name="app_name">JoestarApp</string>
+    <string name="app_name">Agbehonou</string>
 
     <!-- activity_labyrinthe -->
     <string name="titreJeu">Laby Chaos</string>
