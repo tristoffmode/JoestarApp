@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -12,14 +14,25 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.JoestarApp">
         <activity
+            android:name=".labyrinthe.view.ParametresActivity"
+            android:exported="false" />
+        <!-- Jeu labyrinthe : forcé en paysage -->
+        <activity
+            android:name=".labyrinthe.view.JeuLabyrintheActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.FullScreen" /> <!-- Menu labyrinthe : portrait -->
+        <activity
+            android:name=".LabyrintheActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" /> <!-- Autres activities : inchangées -->
+        <activity
             android:name=".CompteurActivity"
             android:exported="false" />
         <activity
             android:name=".ChronometreActivity"
-            android:exported="false" />
-        <activity
-            android:name=".LabyrintheActivity"
-            android:exported="false" />
+            android:exported="false" /> <!-- Activity principale -->
         <activity
             android:name=".MainActivity"
             android:exported="true">

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/fond"
+    tools:context=".labyrinthe.view.JeuLabyrintheActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:background="@color/hud">
+
+        <TextView
+            android:id="@+id/texteNiveau"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/hud_niveau"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="@color/accent"
+            android:fontFamily="monospace"/>
+
+        <TextView
+            android:id="@+id/texteTemps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/hud_temps"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/texte"
+            android:fontFamily="monospace"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"/>
+
+        <TextView
+            android:id="@+id/texteScore"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/hud_score"
+            android:textSize="13sp"
+            android:textColor="@color/texteSecondaire"
+            android:gravity="end"
+            android:fontFamily="monospace"/>
+
+    </LinearLayout>
+
+    <com.example.joestarapp.labyrinthe.view.VueLabyrinthe
+        android:id="@+id/vueLabyrinthe"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="10dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:background="@color/hud">
+
+        <Button
+            android:id="@+id/boutonRetour"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="@string/bouton_retour"
+            android:textSize="13sp"
+            android:textColor="@color/danger"
+            android:backgroundTint="@color/bouton"
+            android:stateListAnimator="@null"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"/>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/boutonPause"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="@string/bouton_pause"
+            android:textSize="13sp"
+            android:textColor="@color/texte"
+            android:backgroundTint="@color/bouton"
+            android:stateListAnimator="@null"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"/>
+
+    </LinearLayout>
+
+</LinearLayout>

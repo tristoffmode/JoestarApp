@@ -1,3 +1,54 @@
 <resources>
+    <!-- App -->
     <string name="app_name">JoestarApp</string>
+
+    <!-- activity_labyrinthe -->
+    <string name="titreJeu">Laby Chaos</string>
+    <string name="sous_titre">Inclinez pour naviguer</string>
+    <string name="bouton_jouer">JOUER</string>
+    <string name="bouton_parametres">PARAMÈTRES</string>
+    <string name="bouton_quitter">QUITTER</string>
+    <string name="bouton_niveau_prefix">Niveau </string>
+    <string name="label_meilleur_score">Meilleur score :</string>
+
+    <!-- activity_jeu_labyrinthe -->
+    <string name="hud_niveau">Niveau 1</string>
+    <string name="hud_niveau_prefix">Niveau </string>
+    <string name="hud_score">Score : 0</string>
+    <string name="hud_score_prefix">Score : </string>
+    <string name="hud_temps">00:00</string>
+    <string name="bouton_pause">Pause</string>
+    <string name="bouton_reprendre">Reprendre</string>
+    <string name="bouton_retour">← Menu</string>
+
+    <!-- Toasts -->
+    <string name="toast_pause">Pause</string>
+    <string name="toast_reprise">Reprise</string>
+    <string name="toast_niveau_reussi">Niveau réussi !</string>
+    <string name="toast_fin">Bravo, tous les niveaux terminés !</string>
+    <string name="toast_retour_menu">Retour au menu</string>
+    <string name="toast_niveau_verrouille">Terminez le niveau précédent d\'abord !</string>
+    <string name="toast_parametres_bientot">Paramètres bientôt disponibles</string>
+    <string name="erreur_vue">Erreur : vue labyrinthe introuvable</string>
+
+    <!-- Dialogues -->
+    <string name="dialog_score">Score :</string>
+    <string name="dialog_score_final">Score final :</string>
+    <string name="dialog_niveau_suivant">Niveau suivant</string>
+    <string name="dialog_menu">Menu</string>
+    <string name="dialog_menu_principal">Menu principal</string>
+    <string name="dialog_titre_fin">Félicitations !</string>
+
+    <!-- Dessin de chemin -->
+    <string name="toast_dessin_debut">Dessinez votre chemin</string>
+    <string name="toast_dessin_valide">Chemin valide ! La boule suit le chemin…</string>
+    <string name="toast_dessin_invalide">Chemin invalide, réessayez</string>
+
+    <!-- Paramètres -->
+    <string name="titre_parametres">Paramètres</string>
+    <string name="param_vibration_titre">Vibration</string>
+    <string name="param_vibration_desc">Vibrer lors des collisions</string>
+    <string name="param_capteur_titre">Capteur de mouvement</string>
+    <string name="param_capteur_desc">Déplacer la boule en inclinant le téléphone</string>
+    <string name="bouton_retour_parametres">← Retour</string>
 </resources>
