@@ -25,7 +25,7 @@ public class LabyrintheActivity extends AppCompatActivity
     /*                 Constantes                */
     /*-------------------------------------------*/
 
-    private static final int LabyrintheActivity_NOMBRE_NIVEAUX = 15;
+    private static final int LabyrintheActivity_NOMBRE_NIVEAUX = 7;
 
 
     /*-------------------------------------------*/
