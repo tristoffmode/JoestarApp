@@ -25,7 +25,7 @@ public class LabyrintheActivity extends AppCompatActivity
     /*                 Constantes                */
     /*-------------------------------------------*/
 
-    private static final int LabyrintheActivity_NOMBRE_NIVEAUX = 7;
+    private static final int LabyrintheActivity_NOMBRE_NIVEAUX = 15;
 
 
     /*-------------------------------------------*/
@@ -71,7 +71,6 @@ public class LabyrintheActivity extends AppCompatActivity
     {
         super.onResume();
 
-        // Rafraîchir les boutons (ex : retour après un niveau)
         this.construireBoutonsNiveaux();
     }
 
@@ -86,13 +85,13 @@ public class LabyrintheActivity extends AppCompatActivity
 
         int niveauDebloque = this.sauvegarde.getNiveauDebloque();
 
-        for (int i = 1; i <= LabyrintheActivity_NOMBRE_NIVEAUX; i++)
+        for (int cpt = 1; cpt <= LabyrintheActivity_NOMBRE_NIVEAUX; cpt++)
         {
-            final int numNiveau = i;
+            final int numNiveau = cpt;
 
-            boolean debloque     = (i <= niveauDebloque);
-            boolean reussi       = this.sauvegarde.estNiveauReussi(i);
-            int     meilleurScore = this.sauvegarde.getMeilleurScore(i);
+            boolean debloque     = (cpt <= niveauDebloque);
+            boolean reussi       = this.sauvegarde.estNiveauReussi(cpt);
+            int     meilleurScore = this.sauvegarde.getMeilleurScore(cpt);
 
             Button bouton = new Button(this);
 
@@ -100,7 +99,7 @@ public class LabyrintheActivity extends AppCompatActivity
             /*                Texte bouton               */
             /*-------------------------------------------*/
 
-            String texte = this.getString(R.string.bouton_niveau_prefix) + i;
+            String texte = this.getString(R.string.bouton_niveau_prefix) + cpt;
 
             if (reussi)
             {
@@ -109,7 +108,7 @@ public class LabyrintheActivity extends AppCompatActivity
 
             if (!debloque)
             {
-                texte = this.getString(R.string.bouton_niveau_prefix) + i + " est verrouillé";
+                texte = this.getString(R.string.bouton_niveau_prefix) + cpt + " est verrouillé";
             }
 
             bouton.setText(texte);
