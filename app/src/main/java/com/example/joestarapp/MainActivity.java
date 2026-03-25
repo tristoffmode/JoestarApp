@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
         Button button1 = findViewById(R.id.button1);
         Button button2 = findViewById(R.id.button2);
-        Button button3 = findViewById(R.id.button3);
+        Button btnChrono = findViewById(R.id.btnChrono);
 
         button1.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this,LabyrintheActivity.class);
@@ -40,6 +40,10 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        button3.setOnClickListener(v -> Toast.makeText(this, "Button 3 est cliqué", Toast.LENGTH_SHORT).show());
+        btnChrono.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, ChronometreActivity.class);
+            intent.putExtra("source", "MainActivity");
+            startActivity(intent);
+        });
     }
 }
